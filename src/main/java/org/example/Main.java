@@ -7,7 +7,7 @@ package org.example;
 public class Main {
 
     public static void main(String[] args) {
-        ThreadPool threadPool = new SimpleThreadPool(5);
+        ThreadPool threadPool = new SimpleThreadPool(5, null);
 
         for (int i = 0; i < 10; i++) {
             threadPool.execute(

@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SimpleThreadPool implements ThreadPool {
 
     /** 任务队列 */
-    private final Queue<Runnable> taskQueue;
+    private final LinkedBlockingQueue<Runnable> taskQueue;
 
     /** 工作线程数 */
     private final int coreSize;
@@ -23,12 +23,16 @@ public class SimpleThreadPool implements ThreadPool {
     /** 活跃线程数 */
     private final AtomicInteger activeCount;
 
-    public SimpleThreadPool(int coreSize) {
+    public SimpleThreadPool(int coreSize, LinkedBlockingQueue<Runnable> taskQueue) {
         this.coreSize = coreSize;
+        this.taskQueue = Optional.ofNullable(taskQueue).orElseGet(LinkedBlockingQueue::new);
         this.running = true;
-        this.taskQueue = new LinkedBlockingQueue<>();
         this.activeCount = new AtomicInteger(0);
-        init();
+
+        // 创建n个线程轮询任务队列
+        for (int i = 0; i < coreSize; i++) {
+            createPollTaskQueueThread(i);
+        }
     }
 
     @Override
@@ -46,13 +50,6 @@ public class SimpleThreadPool implements ThreadPool {
         // 如果还有任务，等任务都完成再关闭线程池
         while (hasActive()) {}
         this.running = false;
-    }
-
-    private void init() {
-        // 创建n个线程轮询任务队列
-        for (int i = 0; i < coreSize; i++) {
-            createPollTaskQueueThread(i);
-        }
     }
 
     /**
