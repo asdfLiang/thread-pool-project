@@ -1,7 +1,6 @@
-package org.example;
+package org.example.custom;
 
 import java.util.Optional;
-import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
